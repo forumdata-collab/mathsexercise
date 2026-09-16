@@ -40,9 +40,9 @@ body{font-family:'Segoe UI','PingFang TC','Microsoft JhengHei',sans-serif;backgr
 .ws-title{font-size:1.5em;font-weight:700;letter-spacing:.06em}
 .ws-meta{font-size:.9em;color:var(--gray)}
 .qrow{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
-.qcell{flex:0 0 var(--cell);width:var(--cell);height:var(--cell);border:1.5px solid #e5dcd6;border-radius:8px;position:relative;display:flex;align-items:center;justify-content:center;font-size:var(--cell-font);font-weight:700;color:var(--ink);page-break-inside:avoid}
-.qcell .qtext{line-height:1.25;text-align:center;padding:4px}
-.qcell .ans-line{position:absolute;bottom:12%;left:18%;right:18%;border-bottom:1.5px solid var(--ink)}
+.qcell{flex:0 0 var(--cell);width:var(--cell);height:var(--cell);border:1.5px solid #e5dcd6;border-radius:8px;position:relative;display:flex;align-items:center;justify-content:center;font-size:var(--cell-font);font-weight:700;color:var(--ink);page-break-inside:avoid;overflow:hidden;padding:4px}
+.qcell .qtext{line-height:1.25;text-align:center;padding:2px;word-wrap:break-word;max-width:100%;overflow:hidden}
+.qcell .ans-line{position:absolute;bottom:6%;left:18%;right:18%;border-bottom:1.5px solid var(--ink)}
 .qcell.show-ans::after{content:attr(data-ans);position:absolute;top:6%;right:8%;font-size:.42em;color:var(--red);font-weight:400}
 .qcell.vmode{padding:8px}
 .qcell.vmode .vmath{display:flex;flex-direction:column;align-items:flex-end;line-height:1.2}
@@ -460,7 +460,7 @@ function render(questions,opts){
   const ws=$('worksheet');
   const cellPx=opts.perRow<=6?'108px':'86px';
   ws.style.setProperty('--cell',cellPx);
-  ws.style.setProperty('--cell-font',`${cellPx} * .55`);
+  ws.style.setProperty('--cell-font',`calc(${cellPx} * .55)`);
   ws.style.setProperty('--print-cell',opts.printSize);
   ws.style.setProperty('--print-cell-font',`calc(${opts.printSize} * .55)`);
 
@@ -477,9 +477,9 @@ function render(questions,opts){
       cell.innerHTML=clockSVG(q.clock.h,q.clock.m);
       const nd=document.createElement('div');nd.className='clock-num';nd.textContent='___:___';cell.appendChild(nd);
     }else if(q.op==='timecalc'){
-      const inner=document.createElement('div');inner.className='qtext';inner.style.fontSize='.48em';inner.style.lineHeight='1.4';
+      const inner=document.createElement('div');inner.className='qtext';inner.style.fontSize='11px';inner.style.lineHeight='1.3';inner.style.padding='2px';
       const tc=q.timecalc,f=(h,m)=>`${h%12||12}:${String(m).padStart(2,'0')}`;
-      inner.innerHTML=`${f(tc.h1,tc.m1)} 開始<br>經過 ${tc.mins} 分鐘<br>是幾點？`;cell.appendChild(inner);
+      inner.innerHTML=`${f(tc.h1,tc.m1)} + ${tc.mins}分<br>= ?`;cell.appendChild(inner);
       if(opts.underline){const l=document.createElement('div');l.className='ans-line';cell.appendChild(l)}
     }else if(q.op==='numberline'){
       cell.style.cssText='width:auto;min-width:var(--cell);padding:4px 6px;overflow:visible';
@@ -505,6 +505,11 @@ function render(questions,opts){
     }else{
       const inner=document.createElement('div');inner.className='qtext';
       inner.textContent=q.q;cell.appendChild(inner);
+      // Auto-shrink long questions (word problems, 因數, 概率, 平均數…) so they fit the cell
+      const qlen=(q.q||'').length;
+      if(qlen>20){inner.style.fontSize='9px';inner.style.lineHeight='1.35'}
+      else if(qlen>12){inner.style.fontSize='12px';inner.style.lineHeight='1.3'}
+      else if(qlen>7){inner.style.fontSize='16px'}
       if(opts.underline){const l=document.createElement('div');l.className='ans-line';cell.appendChild(l)}
     }
     if(opts.num){const n=document.createElement('span');n.style.cssText='position:absolute;top:4%;left:6%;font-size:.3em;color:var(--gray);font-weight:400';n.textContent=idx+1;cell.appendChild(n)}
