@@ -242,9 +242,16 @@ function genMixed(){const f=[genAdd.bind(null,100),genSub.bind(null,100),genMul,
 function genMulAdd(){const m=ri(2,9),a=ri(1,9);return{q:`${m} × ${a} + ${ri(1,9)}`,a:m*a+ri(1,9),va:m,vb:a,op:'muladd',gen(){const m=ri(2,9),a=ri(1,9),add=ri(1,9);return{q:`${m} × ${a} + ${add}`,a:m*a+add,va:m,vb:a,op:'muladd'}}}}
 function genMulSub(){const m=ri(3,9),a=ri(2,9),s=ri(1,m*a-1);return{q:`${m} × ${a} − ${s}`,a:m*a-s,va:m,vb:a,op:'mulsub',gen(){const m=ri(3,9),a=ri(2,9),s=ri(1,m*a-1);return{q:`${m} × ${a} − ${s}`,a:m*a-s,va:m,vb:a,op:'mulsub'}}}}
 function genMulDiv(){const m=ri(3,9),d=ri(2,9);return{q:`${m*d} ÷ ${d} × ${m}`,a:m*m,va:m*d,vb:d,op:'muldiv',gen(){const m=ri(3,9),d=ri(2,9);return{q:`${m*d} ÷ ${d} × ${m}`,a:m*m,va:m*d,vb:d,op:'muldiv'}}}}
-function genFast(){const ops=['+','−','×'];const q=[];
-  for(let i=0;i<3;i++)q.push(ri(1,9));const op1=ops[ri(0,2)],op2=ops[ri(0,2)];
-  const expr=`${q[0]} ${op1} ${q[1]} ${op2} ${q[2]}`;let a=q[0];a=op1==='+'?a+q[1]:op1==='−'?a-q[1]:a*q[1];a=op2==='+'?a+q[2]:op2==='−'?a-q[2]:a*q[2];
+function genFast(){
+  // Respect operator precedence: × binds before +/−. Retry if intermediate goes negative.
+  const ops=['+','−','×'];let q,op1,op2,expr,a,guard=0;
+  do{
+    q=[ri(1,9),ri(1,9),ri(1,9)];op1=ops[ri(0,2)];op2=ops[ri(0,2)];
+    if(op1==='×'&&op2==='×'){a=q[0]*q[1]*q[2];expr=`${q[0]} × ${q[1]} × ${q[2]}`;}
+    else if(op1==='×'){const t=q[0]*q[1];a=op2==='+'?t+q[2]:t-q[2];expr=`${q[0]} × ${q[1]} ${op2} ${q[2]}`;}
+    else if(op2==='×'){const t=q[1]*q[2];a=op1==='+'?q[0]+t:q[0]-t;expr=`${q[0]} ${op1} ${q[1]} × ${q[2]}`;}
+    else{a=op1==='+'?q[0]+q[1]:q[0]-q[1];a=op2==='+'?a+q[2]:a-q[2];expr=`${q[0]} ${op1} ${q[1]} ${op2} ${q[2]}`;}
+  }while(a<0&&++guard<20);
   return{q:expr,a,va:0,vb:0,op:'fast'}
 }
 /* --- Fraction basics --- */
@@ -374,7 +381,7 @@ function pickGen(topic,grade){
   if(topic==='除加混合')return{gen:()=>{const d=ri(2,9),q=ri(2,9),add=ri(1,9);return{q:`${d*q} ÷ ${d} + ${add}`,a:q+add,op:'divadd'}}};
   if(topic==='除減混合')return{gen:()=>{const d=ri(2,9),q=ri(3,9),sub=ri(1,q-1);return{q:`${d*q} ÷ ${d} − ${sub}`,a:q-sub,op:'divsub'}}};
   if(topic==='分數：真假帶'||topic==='擴分約分'||topic==='分數加減'){
-    if(topic==='擴分約分')return{gen:()=>{const d=[2,3,4,5][ri(0,3)],m=ri(2,5);return{q:`${d}/${d*m} = ?/${m}`,a:d,op:'eqfrac'}}};
+    if(topic==='擴分約分')return{gen:()=>{const d=[2,3,4,5][ri(0,3)],m=ri(2,5);return{q:`${d}/${d*m} = ?/${m}`,a:1,op:'eqfrac'}}};
     if(topic==='分數加減')return{gen:genFracAdd};
     return{gen:genFracBasic};
   }
@@ -389,7 +396,15 @@ function pickGen(topic,grade){
   if(topic==='小數加減')return{gen:genDecAdd};
   if(topic==='小數乘法')return{gen:genDecMul};
   if(topic==='小數除法')return{gen:()=>{const d=[2,5][ri(0,1)],n=ri(1,9)+ri(1,9)/d;return{q:`${n.toFixed(1)} ÷ ${d}`,a:(n/d).toFixed(1),op:'÷'}}};
-  if(topic==='分數除以整數'||topic==='整數除以分數'||topic==='分數除以分數')return{gen:()=>{const d=ri(2,6),n=ri(1,d-1);return{q:`${n}/${d} = ?`,a:`${n}/${d}`,op:'frac'}}};
+  if(topic==='分數除以整數'||topic==='整數除以分數'||topic==='分數除以分數')return{gen:()=>{
+    const d=ri(2,6),n=ri(1,d-1);
+    if(topic==='分數除以整數'){const k=ri(2,5);return{q:`${n}/${d} ÷ ${k}`,a:`${n}/${d*k}`,op:'frac',frac:{n,d:n*d}};}
+    if(topic==='整數除以分數'){const k=ri(2,5);return{q:`${k} ÷ ${n}/${d}`,a:`${k*d}/${n}`,op:'frac',frac:{n:k*d,d:n}};}
+    // 分數除以分數：結果要整數答案
+    const n2=ri(1,5),d2=ri(2,6),ans_n=n*d2,ans_d=d*n2;
+    if(ans_n%ans_d===0)return{q:`${n}/${d} ÷ ${n2}/${d2}`,a:ans_n/ans_d,op:'frac'};
+    return{q:`${n}/${d} ÷ ${n2}/${d2}`,a:`${ans_n}/${ans_d}`,op:'frac',frac:{n:ans_n,d:ans_d}};
+  }};
   // P6 upper
   if(topic==='百分數'||topic==='百分數加減')return{gen:genPct};
   if(topic==='小數四則')return{gen:genDecAdd};
