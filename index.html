@@ -477,7 +477,7 @@ function generate(reseed){
 function render(questions,opts){
   $('printBar').classList.add('show');
   $('wsTitle').textContent=opts.title;
-  $('wsMeta').textContent=[opts.name&&('姓名：'+opts.name),opts.date&&('日期：'+opts.date)].filter(Boolean).join('　')||opts.date;
+  $('wsMeta').textContent=[opts.name&&('姓名：'+opts.name),opts.date&&('日期：'+opts.date),opts.score&&('分數：'+opts.score)].filter(Boolean).join('　')||opts.date;
 
   const ws=$('worksheet');
   // Responsive cell size: fit perRow columns in the available width
