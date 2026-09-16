@@ -47,8 +47,11 @@ body{font-family:'Segoe UI','PingFang TC','Microsoft JhengHei',sans-serif;backgr
 .qcell .ans-line{position:absolute;bottom:15%;left:18%;right:18%;border-bottom:1.5px solid var(--ink)}
 .qcell.show-ans::after{content:attr(data-ans);position:absolute;top:6%;right:8%;font-size:.28em;color:var(--red);font-weight:400}
 .qcell.vmode{padding:8px}
-.qcell.vmode .vmath{display:flex;flex-direction:column;align-items:flex-end;line-height:1.2}
-.qcell.vmode .vop{position:absolute;left:12%;top:18%;font-size:.85em}
+.qcell.vmode .vmath{display:flex;flex-direction:column;align-items:stretch;line-height:1.25;width:100%}
+.qcell.vmode .vnum,.qcell.vmode .vrow2{display:grid;grid-template-columns:1ch 1fr}
+.qcell.vmode .vopsp{visibility:hidden}
+.qcell.vmode .vop{font-size:.85em}
+.qcell.vmode .vval{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
 .qcell.vmode .vline{border-bottom:2px solid var(--ink);width:100%;margin:2px 0}
 .qcell.vmode .vans{min-height:1.2em}
 .qcell.vmode .vans.fill{width:60%;border-bottom:1.5px solid var(--ink);margin-top:4px}
@@ -138,6 +141,7 @@ body{background:#fff!important}
       <div class="opt-group"><label>標題</label><input type="text" id="optTitle" placeholder="例如：數學練習（二）"></div>
       <div class="opt-group"><label>姓名</label><input type="text" id="optName" placeholder="同學姓名"></div>
       <div class="opt-group"><label>日期</label><input type="text" id="optDate" placeholder="例：2026年9月16日"></div>
+      <div class="opt-group"><label>分數</label><input type="text" id="optScore" placeholder="（可留空）"></div>
     </div>
     <div style="margin-top:10px;display:flex;gap:18px;flex-wrap:wrap;">
       <label class="opt-check"><input type="checkbox" id="optShowAns"> 顯示答案</label>
@@ -460,12 +464,13 @@ function generate(reseed){
   const title=$('optTitle').value.trim()||$('optGrade').selectedOptions[0].text;
   const name=$('optName').value.trim();
   const date=$('optDate').value.trim()||new Date().toLocaleDateString('zh-HK');
+  const score=$('optScore').value.trim();
 
   const{gen}=pickGen(topic,grade);
   const questions=[];
   for(let i=0;i<count;i++){const q=typeof gen==='function'?gen():gen.gen();questions.push(q)}
 
-  render(questions,{grade,topic,count,perRow,layout,printSize,showAns,underline,num,title,name,date});
+  render(questions,{grade,topic,count,perRow,layout,printSize,showAns,underline,num,title,name,date,score});
   try{localStorage.setItem('me_prefs',JSON.stringify({grade,topic,count,perRow,layout,printSize,showAns,underline,num,title,name,date}))}catch(e){}
 }
 
@@ -524,13 +529,21 @@ function render(questions,opts){
         else{va=0;vb=0}
       }
       const v=document.createElement('div');v.className='vmath';
-      const op=document.createElement('span');op.className='vop';op.textContent=q.op;
       const vaS=String(va),vbS=String(vb),pad=Math.max(vaS.length,vbS.length);
-      const n1=document.createElement('div');n1.textContent=vaS.padStart(pad);
+      // Row 1: first operand, right-aligned with hidden op placeholder for digit alignment
+      const n1=document.createElement('div');n1.className='vnum';
+      const sp=document.createElement('span');sp.className='vopsp';sp.textContent='+';
+      const v1=document.createElement('span');v1.className='vval';v1.textContent=vaS.padStart(pad);
+      n1.append(sp,v1);
+      // Row 2: op + second operand
+      const row2=document.createElement('div');row2.className='vrow2';
+      const op=document.createElement('span');op.className='vop';op.textContent=q.op;
+      const v2=document.createElement('span');v2.className='vval';v2.textContent=vbS.padStart(pad);
+      row2.append(op,v2);
+      // Line under row2
       const line=document.createElement('div');line.className='vline';
-      const n2=document.createElement('div');n2.textContent=vbS.padStart(pad);
       const ans=document.createElement('div');ans.className='vans'+(opts.underline?' fill':'');ans.dataset.ans=q.a;
-      v.append(op,n1,line,n2,ans);cell.appendChild(v);
+      v.append(n1,row2,line,ans);cell.appendChild(v);
     }else{
       const inner=document.createElement('div');inner.className='qtext';
       inner.textContent=q.q;cell.appendChild(inner);
