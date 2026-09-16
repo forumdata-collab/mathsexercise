@@ -198,7 +198,7 @@ const CURRICULUM = {
 function ri(a,b){return a+Math.floor(Math.random()*(b-a+1))}
 function riNot(a,b,not){let v;do{v=ri(a,b)}while(v===not);return v}
 
-function genSingleDigit(){return{q:`${ri(0,5)} + ${ri(0,5)}`,a:null,op:'+',va:0,vb:0,gen:()=>{const a=ri(0,5),b=ri(0,5);return{q:`${a} + ${b}`,a:a+b,va:a,vb:b,op:'+'}}}}
+function genSingleDigit(){const a=ri(0,5),b=ri(0,5);return{q:`${a} + ${b}`,a:a+b,va:a,vb:b,op:'+'}}
 function genOddEven(){
   const n=ri(1,30),ans=n%2===0?'雙':'單';
   return{q:`${n} 是單數還是雙數？`,a:ans,va:n,vb:0,op:'odd',grid:null}
@@ -345,7 +345,7 @@ function genRatio(){
 function pickGen(topic,grade){
   const g=grade;
   // P1
-  if(topic==='10以內的數')return{gen:()=>{const a=ri(0,9),b=ri(0,9-a);return{q:`${a} + ${b}`,a:a+b,op:'+'}}};
+  if(topic==='10以內的數')return{gen:()=>{const a=ri(0,9),b=ri(0,9-a);return{q:`${a} + ${b}`,a:a+b,va:a,vb:b,op:'+'}}};
   if(topic==='單數和雙數')return{gen:()=>{const n=ri(1,30);return{q:`${n} 是單數還是雙數？`,a:n%2===0?'雙':'單',op:'odd'}}};
   if(topic==='20以內的數')return{gen:()=>genAdd(20)};
   if(topic==='基本加減')return{gen:()=>ri(0,1)?genAdd(18):genSub(18)};
@@ -516,12 +516,19 @@ function render(questions,opts){
       svg+=`</svg>`;cell.innerHTML=svg;
     }else if(opts.layout==='v'&&['+','−','×','÷'].includes(q.op)){
       cell.classList.add('vmode');cell.style.fontSize='calc(var(--cell-font) * .72)';
+      // Derive operands from q.va/q.vb if present, else parse from the question string
+      let va=q.va,vb=q.vb;
+      if(va==null||vb==null){
+        const m=String(q.q||'').match(/(-?\d+(?:\.\d+)?)\s*[+\-−×÷]\s*(-?\d+(?:\.\d+)?)/);
+        if(m){va=Number(m[1]);vb=Number(m[2]);}
+        else{va=0;vb=0}
+      }
       const v=document.createElement('div');v.className='vmath';
       const op=document.createElement('span');op.className='vop';op.textContent=q.op;
-      const va=String(q.va||0),vb=String(q.vb||0),pad=Math.max(va.length,vb.length);
-      const n1=document.createElement('div');n1.textContent=va.padStart(pad);
+      const vaS=String(va),vbS=String(vb),pad=Math.max(vaS.length,vbS.length);
+      const n1=document.createElement('div');n1.textContent=vaS.padStart(pad);
       const line=document.createElement('div');line.className='vline';
-      const n2=document.createElement('div');n2.textContent=vb.padStart(pad);
+      const n2=document.createElement('div');n2.textContent=vbS.padStart(pad);
       const ans=document.createElement('div');ans.className='vans'+(opts.underline?' fill':'');ans.dataset.ans=q.a;
       v.append(op,n1,line,n2,ans);cell.appendChild(v);
     }else{
