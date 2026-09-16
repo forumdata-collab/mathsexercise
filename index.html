@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>數學練習簿 — 年級數學 · 四則運算 · 時間推理 · 列印 A4</title>
 <style>
-:root{--red:#C0392B;--red-light:#F4DEDB;--ink:#3A3A3A;--gray:#8A8A8A;--bg:#FDF6F0;--blue:#2C6FAC;--cell:100px;--cell-font:calc(var(--cell) * .28);--print-cell:2.2cm;--print-cell-font:calc(2.2cm * .28)}
+:root{--red:#C0392B;--red-light:#F4DEDB;--ink:#3A3A3A;--gray:#8A8A8A;--bg:#FDF6F0;--blue:#1A5276;--cell:100px;--cell-font:calc(var(--cell) * .28);--print-cell:2.2cm;--print-cell-font:calc(2.2cm * .35)}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI','PingFang TC','Microsoft JhengHei',sans-serif;background:var(--bg);color:var(--ink)}
 #root,[hidden]{display:none!important}
@@ -29,8 +29,10 @@ body{font-family:'Segoe UI','PingFang TC','Microsoft JhengHei',sans-serif;backgr
 .qtype-btn:hover{border-color:var(--red)}
 .qtype-btn.active{background:var(--red);border-color:var(--red);color:#fff}
 .gen-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:16px}
-.btn-gen{padding:11px 26px;border:none;border-radius:9px;font-size:1.05em;font-weight:700;background:var(--red);color:#fff;cursor:pointer;transition:all .15s}
+.btn-gen{padding:12px 28px;border:none;border-radius:9px;font-size:1.05em;font-weight:700;background:var(--red);color:#fff;cursor:pointer;transition:all .15s}
 .btn-gen:hover{background:#a93226;transform:translateY(-1px)}
+.btn-swap{padding:12px 20px;border:none;border-radius:9px;font-size:1.02em;font-weight:700;background:var(--blue);color:#fff;cursor:pointer;transition:all .15s}
+.btn-swap:hover{background:#143c5e;transform:translateY(-1px)}
 .print-bar{display:none;gap:8px;flex-wrap:wrap;margin:14px 0}
 .print-bar.show{display:flex}
 .print-bar button{padding:9px 18px;border:2px solid var(--red);background:#fff;color:var(--red);border-radius:8px;font-size:.95em;font-weight:600;cursor:pointer;transition:all .15s}
@@ -42,7 +44,7 @@ body{font-family:'Segoe UI','PingFang TC','Microsoft JhengHei',sans-serif;backgr
 .qrow{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
 .qcell{flex:0 0 var(--qcell-w,var(--cell));width:var(--qcell-w,var(--cell));height:auto;aspect-ratio:1/1;border:1.5px solid #e5dcd6;border-radius:8px;position:relative;display:flex;align-items:center;justify-content:center;font-size:var(--cell-font);font-weight:700;color:var(--ink);page-break-inside:avoid;overflow:hidden;padding:4px}
 .qcell .qtext{line-height:1.25;text-align:center;padding:2px;word-wrap:break-word;max-width:100%;overflow:hidden}
-.qcell .ans-line{position:absolute;bottom:6%;left:18%;right:18%;border-bottom:1.5px solid var(--ink)}
+.qcell .ans-line{position:absolute;bottom:15%;left:18%;right:18%;border-bottom:1.5px solid var(--ink)}
 .qcell.show-ans::after{content:attr(data-ans);position:absolute;top:6%;right:8%;font-size:.28em;color:var(--red);font-weight:400}
 .qcell.vmode{padding:8px}
 .qcell.vmode .vmath{display:flex;flex-direction:column;align-items:flex-end;line-height:1.2}
@@ -73,9 +75,9 @@ body{font-family:'Segoe UI','PingFang TC','Microsoft JhengHei',sans-serif;backgr
 @media print{@page{size:A4;margin:12mm}
 body{background:#fff!important}
 .site-header,.options,.print-bar,.modal-overlay,.no-print,.grade-banner{display:none!important}
-#worksheet{box-shadow:none;margin:0;padding:0;border-radius:0;max-width:none;--cell:var(--print-cell,2.2cm)!important;--cell-font:var(--print-cell-font,calc(2.2cm * .28))!important}
-.qrow{gap:4px}
-.qcell{flex:0 0 var(--print-cell,2.2cm)!important;width:var(--print-cell,2.2cm)!important;height:var(--print-cell,2.2cm)!important;border:1px solid #c5b8b2;page-break-inside:avoid;font-size:var(--print-cell-font,calc(2.2cm * .28))!important}
+#worksheet{box-shadow:none;margin:0;padding:0;border-radius:0;max-width:none;--cell:var(--print-cell,2.2cm)!important;--cell-font:var(--print-cell-font,calc(2.2cm * .35))!important}
+.qrow{gap:4px;justify-content:center}
+.qcell{flex:1 1 0;width:auto;max-width:var(--print-cell,2.2cm);aspect-ratio:1/1;border:1px solid #c5b8b2;border-radius:0!important;box-shadow:none!important;page-break-inside:avoid;font-size:var(--print-cell-font,calc(2.2cm * .35))!important}
 .ws-header{border-bottom:.5pt solid var(--red);margin-bottom:14px}}
 </style>
 </head>
@@ -146,7 +148,7 @@ body{background:#fff!important}
 
   <div class="gen-bar">
     <button class="btn-gen" onclick="generate()">📝 生成練習簿</button>
-    <button class="btn-gen" style="background:var(--blue)" onclick="generate(true)">🔀 換一組新題目</button>
+    <button class="btn-swap" onclick="generate(true)">🔀 換一組新題目</button>
   </div>
 </div>
 
@@ -481,7 +483,7 @@ function render(questions,opts){
   ws.style.setProperty('--cell', cellPx + 'px');
   ws.style.setProperty('--cell-font', fontPx + 'px');
   ws.style.setProperty('--print-cell',opts.printSize);
-  ws.style.setProperty('--print-cell-font',`calc(${opts.printSize} * .28)`);
+  ws.style.setProperty('--print-cell-font',`calc(${opts.printSize} * .35)`);
   ws.style.setProperty('--qcell-w', `calc((100% - ${gaps}px)/${opts.perRow})`);
 
   const area=$('qArea');area.innerHTML='';
@@ -560,7 +562,7 @@ function openA4Preview(){
   clone.style.setProperty('--cell-font','calc(86px * .28)');
   clone.style.setProperty('--qcell-w','100px');
   clone.style.setProperty('--print-cell',ps);
-  clone.style.setProperty('--print-cell-font','calc(' + ps + ' * .28)');
+  clone.style.setProperty('--print-cell-font',`calc(${ps} * .35)`);
   clone.querySelectorAll('.no-print').forEach(el=>el.remove());
   frame.innerHTML='';frame.appendChild(clone);
   frame.style.width=Math.round(794*.5)+'px';frame.style.height=Math.round(1123*.5)+'px';
