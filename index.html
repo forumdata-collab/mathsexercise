@@ -3,166 +3,113 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>數學練習簿 — 四則運算 · 時間推理 · 列印練習紙</title>
+<title>數學練習簿 — 年級數學 · 四則運算 · 時間推理 · 列印 A4</title>
 <style>
-:root {
-  --red: #C0392B; --red-light: #F4DEDB; --red-grid: #D8B4B0;
-  --guide-line: #D8C8C8; --ink: #3A3A3A; --bg: #FDF6F0;
-  --blue: #2C6FAC; --green: #3A7D44; --gray: #8A8A8A;
-  --cell: 96px; --cell-font: calc(var(--cell) * 0.55);
-  --print-cell: 2.2cm; --print-cell-font: calc(var(--print-cell) * 0.55);
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', sans-serif; background: var(--bg); color: var(--ink); }
-#root, [hidden] { display: none !important; }
-.container { max-width: 980px; margin: 0 auto; padding: 24px 16px 60px; }
-
-/* ===== header ===== */
-.site-header { text-align: center; margin-bottom: 24px; }
-.site-header h1 { font-size: 1.7em; color: var(--red); letter-spacing: 0.06em; }
-.site-header .sub { color: var(--gray); font-size: 0.95em; margin-top: 4px; }
-
-/* ===== options ===== */
-.options { background: white; border-radius: 14px; padding: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 20px; }
-.opt-section { margin-bottom: 18px; }
-.opt-section:last-child { margin-bottom: 0; }
-.opt-section h3 { font-size: 1.05em; color: var(--red); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
-.opt-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
-.opt-group { display: flex; flex-direction: column; gap: 4px; }
-.opt-group label { font-size: 0.85em; color: var(--gray); }
-.opt-group select, .opt-group input[type=number], .opt-group input[type=text] {
-  padding: 7px 9px; border: 1.5px solid #ddd; border-radius: 7px; font-size: 0.95em; width: 100%;
-}
-.opt-group select:focus, .opt-group input:focus { outline: none; border-color: var(--red); }
-.opt-check { display: flex; align-items: center; gap: 8px; font-size: 0.92em; padding: 6px 0; }
-.opt-check input { width: 17px; height: 17px; accent-color: var(--red); }
-.qtype-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
-.qtype-btn { padding: 9px 10px; border: 2px solid #e0d5d0; border-radius: 9px; background: white; cursor: pointer; font-size: 0.95em; font-weight: 600; color: var(--ink); transition: all 0.15s; }
-.qtype-btn:hover { border-color: var(--red); }
-.qtype-btn.active { background: var(--red); border-color: var(--red); color: white; }
-.gen-bar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 16px; }
-.btn-gen {
-  padding: 11px 26px; border: none; border-radius: 9px; font-size: 1.05em; font-weight: 700;
-  background: var(--red); color: white; cursor: pointer; transition: all 0.15s;
-}
-.btn-gen:hover { background: #a93226; transform: translateY(-1px); }
-
-/* ===== print bar ===== */
-.print-bar { display: none; gap: 8px; flex-wrap: wrap; margin: 14px 0; }
-.print-bar.show { display: flex; }
-.print-bar button {
-  padding: 9px 18px; border: 2px solid var(--red); background: white; color: var(--red);
-  border-radius: 8px; font-size: 0.95em; font-weight: 600; cursor: pointer; transition: all 0.15s;
-}
-.print-bar button:hover { background: var(--red); color: white; }
-.print-bar button.active { background: var(--red); color: white; }
-
-/* ===== worksheet ===== */
-#worksheet {
-  background: white; border-radius: 10px; padding: 28px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-  margin-top: 10px;
-}
-.ws-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px double var(--red); }
-.ws-title { font-size: 1.5em; font-weight: 700; letter-spacing: 0.06em; color: var(--ink); }
-.ws-meta { font-size: 0.9em; color: var(--gray); }
-.qrow { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
-.qcell {
-  flex: 0 0 var(--cell); width: var(--cell); height: var(--cell);
-  border: 1.5px solid #e5dcd6; border-radius: 8px; position: relative;
-  display: flex; align-items: center; justify-content: center;
-  font-size: var(--cell-font); font-weight: 700; color: var(--ink);
-  page-break-inside: avoid;
-}
-.qcell .qtext { line-height: 1.25; text-align: center; }
-.qcell .ans-line {
-  position: absolute; bottom: 12%; left: 18%; right: 18%;
-  border-bottom: 1.5px solid var(--ink); height: 0;
-}
-.qcell.show-ans::after {
-  content: attr(data-ans); position: absolute; top: 8%; right: 10%;
-  font-size: 0.45em; color: var(--red); font-weight: 400;
-}
-
-/* vertical (直式) layout */
-.qcell.vmode { padding: 8px; }
-.qcell.vmode .vmath { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.2; }
-.qcell.vmode .vop { position: absolute; left: 16%; top: 18%; font-size: 0.9em; }
-.qcell.vmode .vline { border-bottom: 2px solid var(--ink); width: 100%; margin: 2px 0; }
-.qcell.vmode .vans { min-height: 1.2em; }
-.qcell.vmode .vans.fill { width: 60%; border-bottom: 1.5px solid var(--ink); margin-top: 4px; }
-.qcell.vmode.show-ans .vans::after { content: attr(data-ans); color: var(--red); font-size: 0.85em; font-weight: 400; }
-
-/* clock cells */
-.qcell.clock-cell { overflow: hidden; }
-.qcell.clock-cell svg { width: 92%; height: 92%; }
-.clock-num { position: absolute; bottom: 6%; width: 100%; text-align: center; font-size: 0.5em; color: var(--ink); }
-
-/* ===== modal (A4 preview) ===== */
-.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1000; justify-content: center; align-items: flex-start; padding: 20px; overflow-y: auto; }
-.modal-overlay.show { display: flex; }
-.modal { background: white; border-radius: 14px; width: 100%; max-width: 600px; padding: 18px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
-.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-.modal-header h3 { font-size: 1.1em; }
-.modal-close { background: none; border: none; font-size: 1.5em; cursor: pointer; color: var(--gray); }
-.modal-close:hover { color: var(--red); }
-#a4PreviewInfo { font-size: 0.85em; color: var(--gray); margin-bottom: 6px; }
-#a4PreviewWarn { font-size: 0.8em; color: #b8860b; margin-bottom: 10px; }
-#a4PreviewFrame { overflow: hidden; border: 1px solid #eee; border-radius: 6px; background: white; position: relative; }
-
-/* ===== footer ===== */
-.site-footer { text-align: center; color: var(--gray); font-size: 0.85em; margin-top: 40px; line-height: 1.7; }
-.site-footer a { color: var(--blue); text-decoration: none; }
-
-/* ===== print ===== */
-@media print {
-  @page { size: A4; margin: 12mm; }
-  body { background: white !important; }
-  .site-header, .options, .print-bar, .modal-overlay, .no-print { display: none !important; }
-  #worksheet {
-    box-shadow: none; margin: 0; padding: 0; border-radius: 0; max-width: none;
-    --cell: var(--print-cell, 2.2cm) !important;
-    --cell-font: var(--print-cell-font, calc(2.2cm * 0.55)) !important;
-  }
-  .qrow { gap: 4px; }
-  .qcell { flex: 0 0 var(--cell) !important; width: var(--cell) !important; height: var(--cell) !important; border: 1px solid #c5b8b2; page-break-inside: avoid; }
-  .ws-header { border-bottom: 0.5pt solid var(--red); margin-bottom: 14px; }
-}
+:root{--red:#C0392B;--red-light:#F4DEDB;--ink:#3A3A3A;--gray:#8A8A8A;--bg:#FDF6F0;--blue:#2C6FAC;--cell:100px;--cell-font:0.55em;--print-cell:2.2cm;--print-cell-font:calc(2.2cm * 0.55)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI','PingFang TC','Microsoft JhengHei',sans-serif;background:var(--bg);color:var(--ink)}
+#root,[hidden]{display:none!important}
+.container{max-width:1000px;margin:0 auto;padding:24px 16px 60px}
+.site-header{text-align:center;margin-bottom:24px}
+.site-header h1{font-size:1.7em;color:var(--red);letter-spacing:.06em}
+.site-header .sub{color:var(--gray);font-size:.95em;margin-top:4px}
+.options{background:#fff;border-radius:14px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.06);margin-bottom:20px}
+.opt-section{margin-bottom:18px}
+.opt-section:last-child{margin-bottom:0}
+.opt-section h3{font-size:1.05em;color:var(--red);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.opt-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.opt-group{display:flex;flex-direction:column;gap:4px}
+.opt-group label{font-size:.85em;color:var(--gray)}
+.opt-group select,.opt-group input{padding:7px 9px;border:1.5px solid #ddd;border-radius:7px;font-size:.95em;width:100%}
+.opt-group select:focus,.opt-group input:focus{outline:none;border-color:var(--red)}
+.opt-check{display:flex;align-items:center;gap:8px;font-size:.92em;padding:6px 0}
+.opt-check input{width:17px;height:17px;accent-color:var(--red)}
+.qtype-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px}
+.qtype-btn{padding:9px 8px;border:2px solid #e0d5d0;border-radius:9px;background:#fff;cursor:pointer;font-size:.88em;font-weight:600;color:var(--ink);transition:all .15s;text-align:center}
+.qtype-btn:hover{border-color:var(--red)}
+.qtype-btn.active{background:var(--red);border-color:var(--red);color:#fff}
+.gen-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:16px}
+.btn-gen{padding:11px 26px;border:none;border-radius:9px;font-size:1.05em;font-weight:700;background:var(--red);color:#fff;cursor:pointer;transition:all .15s}
+.btn-gen:hover{background:#a93226;transform:translateY(-1px)}
+.print-bar{display:none;gap:8px;flex-wrap:wrap;margin:14px 0}
+.print-bar.show{display:flex}
+.print-bar button{padding:9px 18px;border:2px solid var(--red);background:#fff;color:var(--red);border-radius:8px;font-size:.95em;font-weight:600;cursor:pointer;transition:all .15s}
+.print-bar button:hover{background:var(--red);color:#fff}
+#worksheet{background:#fff;border-radius:10px;padding:28px;box-shadow:0 2px 12px rgba(0,0,0,.08);margin-top:10px}
+.ws-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:20px;padding-bottom:10px;border-bottom:2px double var(--red)}
+.ws-title{font-size:1.5em;font-weight:700;letter-spacing:.06em}
+.ws-meta{font-size:.9em;color:var(--gray)}
+.qrow{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.qcell{flex:0 0 var(--cell);width:var(--cell);height:var(--cell);border:1.5px solid #e5dcd6;border-radius:8px;position:relative;display:flex;align-items:center;justify-content:center;font-size:var(--cell-font);font-weight:700;color:var(--ink);page-break-inside:avoid}
+.qcell .qtext{line-height:1.25;text-align:center;padding:4px}
+.qcell .ans-line{position:absolute;bottom:12%;left:18%;right:18%;border-bottom:1.5px solid var(--ink)}
+.qcell.show-ans::after{content:attr(data-ans);position:absolute;top:6%;right:8%;font-size:.42em;color:var(--red);font-weight:400}
+.qcell.vmode{padding:8px}
+.qcell.vmode .vmath{display:flex;flex-direction:column;align-items:flex-end;line-height:1.2}
+.qcell.vmode .vop{position:absolute;left:12%;top:18%;font-size:.85em}
+.qcell.vmode .vline{border-bottom:2px solid var(--ink);width:100%;margin:2px 0}
+.qcell.vmode .vans{min-height:1.2em}
+.qcell.vmode .vans.fill{width:60%;border-bottom:1.5px solid var(--ink);margin-top:4px}
+.qcell.vmode.show-ans .vans::after{content:attr(data-ans);color:var(--red);font-size:.85em;font-weight:400}
+.qcell.clock-cell{overflow:hidden}.qcell.clock-cell svg{width:92%;height:92%}
+.clock-num{position:absolute;bottom:6%;width:100%;text-align:center;font-size:.5em;color:var(--gray)}
+.qcell.frac{text-align:center}.qcell.frac .fnum{font-size:.7em}.qcell.frac .fline{border-top:2px solid var(--ink);width:70%;margin:2px auto}.qcell.frac .fden{font-size:.7em}
+.qcell.decimal{font-size:var(--cell-font)}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;justify-content:center;align-items:flex-start;padding:20px;overflow-y:auto}
+.modal-overlay.show{display:flex}
+.modal{background:#fff;border-radius:14px;width:100%;max-width:600px;padding:18px;box-shadow:0 10px 40px rgba(0,0,0,.2)}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.modal-header h3{font-size:1.1em}
+.modal-close{background:none;border:none;font-size:1.5em;cursor:pointer;color:var(--gray)}
+.modal-close:hover{color:var(--red)}
+#a4PreviewInfo{font-size:.85em;color:var(--gray);margin-bottom:6px}
+#a4PreviewWarn{font-size:.8em;color:#b8860b;margin-bottom:10px}
+#a4PreviewFrame{overflow:hidden;border:1px solid #eee;border-radius:6px;background:#fff;position:relative}
+.site-footer{text-align:center;color:var(--gray);font-size:.85em;margin-top:40px;line-height:1.7}
+.site-footer a{color:var(--blue);text-decoration:none}
+.grade-banner{background:linear-gradient(135deg,var(--red) 0%,#e74c3c 100%);color:#fff;padding:12px 16px;border-radius:10px;margin-bottom:12px;font-size:.95em;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.grade-banner .gb-grade{font-size:1.3em;font-weight:700}
+.grade-banner .gb-topics{opacity:.9}
+@media print{@page{size:A4;margin:12mm}
+body{background:#fff!important}
+.site-header,.options,.print-bar,.modal-overlay,.no-print,.grade-banner{display:none!important}
+#worksheet{box-shadow:none;margin:0;padding:0;border-radius:0;max-width:none;--cell:var(--print-cell,2.2cm)!important;--cell-font:var(--print-cell-font,calc(2.2cm * .55))!important}
+.qrow{gap:4px}
+.qcell{flex:0 0 var(--cell)!important;width:var(--cell)!important;height:var(--cell)!important;border:1px solid #c5b8b2;page-break-inside:avoid}
+.ws-header{border-bottom:.5pt solid var(--red);margin-bottom:14px}}
 </style>
 </head>
 <body>
 <div class="container">
-
 <header class="site-header">
   <h1>📐 數學練習簿</h1>
-  <div class="sub">四則運算 · 時間推理 · 直式／橫式 · 列印 A4 工作紙</div>
+  <div class="sub">一年級至六年級 · 數學課題 · 橫式/直式 · 列印 A4 工作紙</div>
 </header>
 
 <div class="options">
   <div class="opt-section">
-    <h3>🧮 題目類型</h3>
-    <div class="qtype-grid" id="qtypeGrid">
-      <button class="qtype-btn" data-q="add">＋ 加法</button>
-      <button class="qtype-btn" data-q="sub">－ 減法</button>
-      <button class="qtype-btn" data-q="mul">× 乘法</button>
-      <button class="qtype-btn" data-q="div">÷ 除法</button>
-      <button class="qtype-btn" data-q="mixed">± 混合四則</button>
-      <button class="qtype-btn" data-q="clock">🕐 讀時鐘</button>
-      <button class="qtype-btn" data-q="timecalc">⏱ 時間計算</button>
-    </div>
-  </div>
-
-  <div class="opt-section">
-    <h3>⚙️ 難度與排版</h3>
+    <h3>🎒 年級與課題</h3>
     <div class="opt-grid">
       <div class="opt-group">
-        <label>難度／範圍</label>
-        <select id="optLevel">
-          <option value="p1">初階（10 以內）</option>
-          <option value="p2">小一（20 以內）</option>
-          <option value="p3" selected>小二（100 以內）</option>
-          <option value="p4">小三（1000 以內）</option>
-          <option value="p5">小四＋（四則混合）</option>
+        <label>年級</label>
+        <select id="optGrade" onchange="onGradeChange()">
+          <option value="p1u">一年級（上）</option>
+          <option value="p1l">一年級（下）</option>
+          <option value="p2u" selected>二年級（上）</option>
+          <option value="p2l">二年級（下）</option>
+          <option value="p3u">三年級（上）</option>
+          <option value="p3l">三年級（下）</option>
+          <option value="p4u">四年級（上）</option>
+          <option value="p4l">四年級（下）</option>
+          <option value="p5u">五年級（上）</option>
+          <option value="p5l">五年級（下）</option>
+          <option value="p6u">六年級（上）</option>
+          <option value="p6l">六年級（下）</option>
         </select>
+      </div>
+      <div class="opt-group">
+        <label>課題</label>
+        <select id="optTopic" onchange="onTopicChange()"></select>
       </div>
       <div class="opt-group">
         <label>題數</label>
@@ -170,27 +117,15 @@ body { font-family: 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
       </div>
       <div class="opt-group">
         <label>每行格數</label>
-        <select id="optPerRow">
-          <option value="4">4 格</option>
-          <option value="6">6 格</option>
-          <option value="8">8 格</option>
-          <option value="10">10 格</option>
-        </select>
+        <select id="optPerRow"><option value="4">4</option><option value="5">5</option><option value="6" selected>6</option><option value="8">8</option><option value="10">10</option></select>
       </div>
       <div class="opt-group">
         <label>題式</label>
-        <select id="optLayout">
-          <option value="h">橫式</option>
-          <option value="v">直式（進位適用）</option>
-        </select>
+        <select id="optLayout"><option value="h">橫式</option><option value="v">直式</option></select>
       </div>
       <div class="opt-group">
         <label>印刷格大小</label>
-        <select id="optPrintSize">
-          <option value="1.8cm">細 (1.8cm)</option>
-          <option value="2.2cm" selected>中 (2.2cm)</option>
-          <option value="2.6cm">大 (2.6cm)</option>
-        </select>
+        <select id="optPrintSize"><option value="1.8cm">細 (1.8cm)</option><option value="2.2cm" selected>中 (2.2cm)</option><option value="2.6cm">大 (2.6cm)</option></select>
       </div>
     </div>
   </div>
@@ -198,21 +133,12 @@ body { font-family: 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
   <div class="opt-section">
     <h3>📄 練習紙資料</h3>
     <div class="opt-grid">
-      <div class="opt-group">
-        <label>標題</label>
-        <input type="text" id="optTitle" placeholder="例如：數學練習（二）">
-      </div>
-      <div class="opt-group">
-        <label>姓名</label>
-        <input type="text" id="optName" placeholder="同學姓名">
-      </div>
-      <div class="opt-group">
-        <label>日期</label>
-        <input type="text" id="optDate" placeholder="例：2026年9月16日">
-      </div>
+      <div class="opt-group"><label>標題</label><input type="text" id="optTitle" placeholder="例如：數學練習（二）"></div>
+      <div class="opt-group"><label>姓名</label><input type="text" id="optName" placeholder="同學姓名"></div>
+      <div class="opt-group"><label>日期</label><input type="text" id="optDate" placeholder="例：2026年9月16日"></div>
     </div>
     <div style="margin-top:10px;display:flex;gap:18px;flex-wrap:wrap;">
-      <label class="opt-check"><input type="checkbox" id="optShowAns"> 顯示答案（右上角細字）</label>
+      <label class="opt-check"><input type="checkbox" id="optShowAns"> 顯示答案</label>
       <label class="opt-check"><input type="checkbox" id="optUnderline" checked> 答案橫線</label>
       <label class="opt-check"><input type="checkbox" id="optNum" checked> 題號</label>
     </div>
@@ -227,346 +153,400 @@ body { font-family: 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
 <div class="print-bar no-print" id="printBar">
   <button onclick="window.print()">🖨️ 列印</button>
   <button onclick="openA4Preview()">📐 A4 預覽</button>
-  <button id="btnShowAns" onclick="toggleShowAns()">🔢 顯示／隱藏答案</button>
-  <span class="bar-sep" style="color:var(--gray);margin:0 4px;"></span>
+  <button id="btnShowAns" onclick="toggleShowAns()">🔢 顯示/隱藏答案</button>
 </div>
 
 <div id="worksheet">
-  <div class="ws-header">
-    <div class="ws-title" id="wsTitle">數學練習</div>
-    <div class="ws-meta" id="wsMeta"></div>
-  </div>
+  <div class="ws-header"><div class="ws-title" id="wsTitle">數學練習</div><div class="ws-meta" id="wsMeta"></div></div>
   <div id="qArea"></div>
 </div>
 
 <div class="site-footer no-print">
-  📐 數學練習簿 — 免費教育用途工作紙生成器<br>
-  支援四則運算（橫式／直式）、讀時鐘、時間計算 · 列印建議使用 A4 直向<br>
-  <a href="https://github.com/forumdata-collab/mathsexercise" target="_blank" rel="noopener">GitHub</a>
+  📐 數學練習簿 — 小一至小六數學工作紙生成器<br>
+  題目根據<a href="https://www.wyjjmps.edu.hk/CP/pG/346/151/412" target="_blank">數學科推介學習</a> curriculum 設計 · 列印建議使用 A4 直向
 </div>
 </div>
 
 <div class="modal-overlay" id="a4PreviewOverlay">
   <div class="modal">
-    <div class="modal-header">
-      <h3>📐 A4 預覽</h3>
-      <button class="modal-close" onclick="closeA4Preview()">×</button>
-    </div>
-    <div id="a4PreviewInfo"></div>
-    <div id="a4PreviewWarn"></div>
-    <div id="a4PreviewFrame"></div>
+    <div class="modal-header"><h3>📐 A4 預覽</h3><button class="modal-close" onclick="closeA4Preview()">×</button></div>
+    <div id="a4PreviewInfo"></div><div id="a4PreviewWarn"></div><div id="a4PreviewFrame"></div>
   </div>
 </div>
 
 <script>
 'use strict';
-/* ================= 題目生成器 ================= */
-
-function ri(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
-
-const LEVELS = {
-  p1: { max: 10 },
-  p2: { max: 20 },
-  p3: { max: 100 },
-  p4: { max: 1000 },
-  p5: { max: 1000 },
+/* ===== 年級-課題 curriculum ===== */
+const CURRICULUM = {
+  p1u: {label:'一年級（上）', topics:['10以內的數','單數和雙數','20以內的數','基本加減']},
+  p1l: {label:'一年級（下）', topics:['100以內的數','加與減(一)']},
+  p2u: {label:'二年級（上）', topics:['三位數讀寫','加與減(二)','9×9乘法表','乘法配對']},
+  p2l: {label:'二年級（下）', topics:['四位數讀寫','加與減(三)','基本除法','有餘數除法']},
+  p3u: {label:'三年級（上）', topics:['五位數讀寫','加與減(四)','兩位數乘一位數','除法','單元乘法']},
+  p3l: {label:'三年級（下）', topics:['乘加混合','乘減混合','乘除混合','快速算術','分數基礎']},
+  p4u: {label:'四年級（上）', topics:['兩位乘兩位','三位乘兩位','長除法','倍數','因數','公倍數','公因數']},
+  p4l: {label:'四年級（下）', topics:['除加混合','除減混合','乘除混合','分數：真假帶','擴分約分','分數加減','小數基礎']},
+  p5u: {label:'五年級（上）', topics:['多位數讀寫','四捨五入','分數加減','分數乘法','分數四則混合']},
+  p5l: {label:'五年級（下）', topics:['小數加減','小數乘法','小數除法','分數除以整數','整數除以分數','分數除以分數']},
+  p6u: {label:'六年級（上）', topics:['百分數','百分數加減','小數四則','分數四則','圓形面積','圓周']},
+  p6l: {label:'六年級（下）', topics:['體積與容量','比例','簡單方程','概率','平均數','綜合練習']},
 };
 
-function genAdd(lv) {
-  const m = LEVELS[lv].max;
-  const a = ri(1, m), b = ri(1, m);
-  return { q: `${a} + ${b}`, a: a + b, va: a, vb: b, op: '+' };
+/* ===== 題目 generators ===== */
+function ri(a,b){return a+Math.floor(Math.random()*(b-a+1))}
+function riNot(a,b,not){let v;do{v=ri(a,b)}while(v===not);return v}
+
+function genSingleDigit(){return{q:`${ri(0,5)} + ${ri(0,5)}`,a:null,op:'+',va:0,vb:0,gen:()=>{const a=ri(0,5),b=ri(0,5);return{q:`${a} + ${b}`,a:a+b,va:a,vb:b,op:'+'}}}}
+function genOddEven(){
+  const n=ri(1,30),ans=n%2===0?'雙':'單';
+  return{q:`${n} 是單數還是雙數？`,a:ans,va:n,vb:0,op:'odd',grid:null}
 }
-function genSub(lv) {
-  const m = LEVELS[lv].max;
-  const a = ri(2, m), b = ri(1, a - 1);
-  return { q: `${a} − ${b}`, a: a - b, va: a, vb: b, op: '−' };
+function genNumberTrack(max){
+  const n=ri(1,max-1);
+  return{q:`${n} + 1 = ?`,a:n+1,va:n,vb:1,op:'+'}
 }
-function genMul(lv) {
-  // 乘法：小二小三用 9×9 表內；小四＋兩位×一位
-  if (lv === 'p4' || lv === 'p5') {
-    const a = ri(11, 99), b = ri(2, 9);
-    return { q: `${a} × ${b}`, a: a * b, va: a, vb: b, op: '×' };
+function genBasicAdd(max){
+  const a=ri(1,max-1),b=ri(1,max-a);
+  return{q:`${a} + ${b}`,a:a+b,va:a,vb:b,op:'+'}
+}
+function genBasicSub(max){
+  const a=ri(2,max),b=ri(1,a-1);
+  return{q:`${a} − ${b}`,a:a-b,va:a,vb:b,op:'−'}
+}
+function genAdd(max){
+  const a=ri(1,max-1),b=ri(1,max-a);
+  return{q:`${a} + ${b}`,a:a+b,va:a,vb:b,op:'+'}
+}
+function genSub(max){
+  const a=ri(2,max),b=ri(1,a-1);
+  return{q:`${a} − ${b}`,a:a-b,va:a,vb:b,op:'−'}
+}
+function genMul9x9(){
+  const a=ri(2,9),b=ri(2,9);
+  return{q:`${a} × ${b}`,a:a*b,va:a,vb:b,op:'×'}
+}
+function genMul(){
+  const a=ri(12,99),b=ri(2,9);
+  return{q:`${a} × ${b}`,a:a*b,va:a,vb:b,op:'×'}
+}
+function genDiv(){
+  const b=ri(2,12),q=ri(2,12);
+  return{q:`${b*q} ÷ ${b}`,a:q,va:b*q,vb:b,op:'÷'}
+}
+function genDivRemain(){
+  const b=ri(2,9),q=ri(2,9);
+  const dividend=b*q+ri(1,b-1);
+  return{q:`${dividend} ÷ ${b}`,a:`${Math.floor(dividend/b)}...${dividend%b}`,va:dividend,vb:b,op:'÷R'}
+}
+function genMixed(){const f=[genAdd.bind(null,100),genSub.bind(null,100),genMul,genDiv];return f[ri(0,3)]()}
+function genMulAdd(){const m=ri(2,9),a=ri(1,9);return{q:`${m} × ${a} + ${ri(1,9)}`,a:m*a+ri(1,9),va:m,vb:a,op:'muladd',gen(){const m=ri(2,9),a=ri(1,9),add=ri(1,9);return{q:`${m} × ${a} + ${add}`,a:m*a+add,va:m,vb:a,op:'muladd'}}}
+function genMulSub(){const m=ri(3,9),a=ri(2,9),s=ri(1,m*a-1);return{q:`${m} × ${a} − ${s}`,a:m*a-s,va:m,vb:a,op:'mulsub',gen(){const m=ri(3,9),a=ri(2,9),s=ri(1,m*a-1);return{q:`${m} × ${a} − ${s}`,a:m*a-s,va:m,vb:a,op:'mulsub'}}}
+function genMulDiv(){const m=ri(3,9),d=ri(2,9);return{q:`${m*d} ÷ ${d} × ${m}`,a:m*m,va:m*d,vb:d,op:'muldiv',gen(){const m=ri(3,9),d=ri(2,9);return{q:`${m*d} ÷ ${d} × ${m}`,a:m*m,va:m*d,vb:d,op:'muldiv'}}}
+function genFast(){const ops=['+','−','×'];const q=[];
+  for(let i=0;i<3;i++)q.push(ri(1,9));const op1=ops[ri(0,2)],op2=ops[ri(0,2)];
+  const expr=`${q[0]} ${op1} ${q[1]} ${op2} ${q[2]}`;let a=q[0];a=op1==='+'?a+q[1]:op1==='−'?a-q[1]:a*q[1];a=op2==='+'?a+q[2]:op2==='−'?a-q[2]:a*q[2];
+  return{q:expr,a,va:0,vb:0,op:'fast'}
+}
+/* --- Fraction basics --- */
+function genFracBasic(){
+  const d=[2,3,4,5,6][ri(0,4)],n=ri(1,d-1);
+  return{q:`${n}/${d}`,a:`${n}/${d}`,va:n,vb:d,op:'frac',frac:{n,d}}
+}
+function genFracAdd(){
+  const d=[2,3,4][ri(0,2)],a=ri(1,d-1),b=ri(1,d-a);
+  return{q:`${a}/${d} + ${b}/${d}`,a:`${a+b}/${d}`,va:a,vb:b,op:'fracadd',frac:{n:a+b,d,d1:d,d2:d}}
+}
+function genFracCompare(){
+  const d1=[2,3,4][ri(0,2)],d2=[2,3,4][ri(0,2)],n1=ri(1,d1-1),n2=ri(1,d2-1);
+  const v1=n1/d1,v2=n2/d2,ans=v1>v2?'>':v1<v2?'<':'=';
+  return{q:`${n1}/${d1} ⃝ ${n2}/${d2}`,a:ans,va:n1,vb:n2,op:'fraccmp'}
+}
+/* --- Decimal --- */
+function genDecAdd(){
+  const a=ri(1,9)+ri(1,9)/10,b=ri(1,9)+ri(1,9)/10;
+  const r=Math.round((a+b)*10)/10;
+  return{q:`${a.toFixed(1)} + ${b.toFixed(1)}`,a:r,va:a,vb:b,op:'+'}
+}
+function genDecMul(){
+  const a=ri(1,9)+ri(1,9)/10,b=ri(1,9);
+  const r=Math.round(a*b*10)/10;
+  return{q:`${a.toFixed(1)} × ${b}`,a:r,va:a,vb:b,op:'×'}
+}
+function genRoundOff(){
+  const n=ri(10,999);const tens=n%10>=5?1:0;
+  return{q:`${n} 四捨五入到十位 = ?`,a:(Math.floor(n/10)+tens)*10,va:n,vb:0,op:'round'}
+}
+/* --- Percent --- */
+function genPct(){
+  const base=[100,200,50,250,500][ri(0,4)],pct=[10,20,25,50,75][ri(0,4)];
+  const ans=base*pct/100;
+  return{q:`${base} 的 ${pct}%`,a:ans,va:base,vb:pct,op:'pct'}
+}
+/* --- Time --- */
+function genClock(){
+  const h=ri(1,12),m=[0,5,10,15,20,25,30,35,40,45,50,55][ri(0,11)];
+  return{q:'clock',clock:{h,m},a:`${h%12||12}:${String(m).padStart(2,'0')}`,va:h,vb:m,op:'clock'}
+}
+function genTimeCalc(){
+  const h1=ri(0,11),m1=[0,5,10,15,20,25,30,35,40,45,50,55][ri(0,11)];
+  const mins=ri(1,12)*5,total=h1*60+m1+mins,h2=Math.floor(total/60),m2=total%60;
+  const f=(h,m)=>`${h%12||12}:${String(m).padStart(2,'0')}`;
+  return{q:'timecalc',timecalc:{h1,m1,mins},a:f(h2,m2),va:h1,vb:m1,op:'timecalc'}
+}
+function genNumberLine(){
+  const step=[5,10,25,50][ri(0,3)];
+  const start=ri(0,5)*step,blank=ri(2,6);
+  const vals=[];
+  for(let i=0;i<7;i++)vals.push(i===blank?null:start+i*step);
+  const ans=vals[blank];
+  return{q:'numberline',numberline:{vals,blank},a:ans,va:start,vb:step,op:'numberline'}
+}
+/* --- Misc P6 --- */
+function genSimpleEq(){
+  const x=ri(1,20),coef=ri(2,9),rhs=coef*x;
+  return{q:`${coef}x = ${rhs}`,a:x,va:coef,vb:rhs,op:'eq'}
+}
+function genAvg(){
+  const nums=[];let sum=0;
+  for(let i=0;i<4;i++){const n=ri(1,20);nums.push(n);sum+=n}
+  return{q:`求平均數：${nums.join('、')}`,a:sum/4,va:0,vb:0,op:'avg'}
+}
+function genSimpleProb(){
+  const total=ri(4,12),favor=ri(1,total-1);
+  return{q:`袋中有${total}個球，其中${favor}個是紅球。隨機取一個，是紅球的概率？`,a:`${favor}/${total}`,va:favor,vb:total,op:'prob'}
+}
+function genAreaCircle(){
+  const r=ri(1,8);
+  return{q:`半徑 ${r} cm 的圓形面積 = ?`,a:`${(Math.PI*r*r).toFixed(1)}`,va:r,vb:0,op:'circle_area'}
+}
+function genCircumference(){
+  const r=ri(1,8);
+  return{q:`半徑 ${r} cm 的圓周 = ?`,a:`${(2*Math.PI*r).toFixed(1)}`,va:r,vb:0,op:'circle_circ'}
+}
+function genVolume(){
+  const l=ri(2,8),w=ri(2,6),h=ri(2,5);
+  return{q:`長方體 ${l}×${w}×${h} cm³ 體積 = ?`,a:l*w*h,va:l,vb:w,op:'vol'}
+}
+function genRatio(){
+  const a=ri(1,5),b=ri(1,5);
+  return{q:`A : B = ${a} : ${b}，A = 12，B = ?`,a:12*b/a,va:a,vb:b,op:'ratio'}
+}
+
+/* --- Topic → generator mapping --- */
+function pickGen(topic,grade){
+  const g=grade;
+  // P1
+  if(topic==='10以內的數')return{gen:()=>{const a=ri(0,9),b=ri(0,9-a);return{q:`${a} + ${b}`,a:a+b,op:'+'}}};
+  if(topic==='單數和雙數')return{gen:()=>{const n=ri(1,30);return{q:`${n} 是單數還是雙數？`,a:n%2===0?'雙':'單',op:'odd'}}};
+  if(topic==='20以內的數')return{gen:()=>genAdd(20)};
+  if(topic==='基本加減')return{gen:()=>ri(0,1)?genAdd(18):genSub(18)};
+  // P1 lower
+  if(topic==='100以內的數')return{gen:()=>genAdd(100)};
+  if(topic==='加與減(一)')return{gen:()=>ri(0,1)?genAdd(100):genSub(100)};
+  // P2
+  if(topic==='三位數讀寫')return{gen:()=>{const n=ri(100,999);return{q:`${n} 的百位、十位、個位是？`,a:`${Math.floor(n/100)}、${Math.floor(n/10)%10}、${n%10}`,op:'place'}}};
+  if(topic==='加與減(二)')return{gen:()=>ri(0,1)?genAdd(999):genSub(999)};
+  if(topic==='9×9乘法表'||topic==='乘法配對')return{gen:genMul9x9};
+  if(topic==='四位數讀寫')return{gen:()=>{const n=ri(1000,9999);return{q:`${n} 的千位、百位、十位、個位是？`,a:`${Math.floor(n/1000)}、${Math.floor(n/100)%10}、${Math.floor(n/10)%10}、${n%10}`,op:'place'}}};
+  if(topic==='加與減(三)')return{gen:()=>ri(0,1)?genAdd(999):genSub(999)};
+  if(topic==='基本除法')return{gen:genDiv};
+  if(topic==='有餘數除法')return{gen:genDivRemain};
+  // P3
+  if(topic==='五位數讀寫')return{gen:()=>{const n=ri(10000,99999);return{q:`${n} 的萬位、千位、百位、十位、個位是？`,a:`${Math.floor(n/10000)}、${Math.floor(n/1000)%10}、${Math.floor(n/100)%10}、${Math.floor(n/10)%10}、${n%10}`,op:'place'}}};
+  if(topic==='加與減(四)')return{gen:()=>ri(0,1)?genAdd(999):genSub(999)};
+  if(topic==='兩位數乘一位數'||topic==='單元乘法')return{gen:()=>{const a=ri(12,99),b=ri(2,9);return{q:`${a} × ${b}`,a:a*b,va:a,vb:b,op:'×'}}};
+  if(topic==='除法')return{gen:genDiv};
+  // P3 lower
+  if(topic==='乘加混合')return{gen:()=>{const m=ri(2,9),a=ri(1,9),add=ri(1,9);return{q:`${m} × ${a} + ${add}`,a:m*a+add,op:'muladd'}}};
+  if(topic==='乘減混合')return{gen:()=>{const m=ri(3,9),a=ri(2,9),s=ri(1,m*a-1);return{q:`${m} × ${a} − ${s}`,a:m*a-s,op:'mulsub'}}};
+  if(topic==='乘除混合')return{gen:()=>{const m=ri(3,9),d=ri(2,9);return{q:`${m*d} ÷ ${d} × ${m}`,a:m*m,op:'muldiv'}}};
+  if(topic==='快速算術')return{gen:genFast};
+  if(topic==='分數基礎')return{gen:()=>{const d=[2,3,4][ri(0,2)],n=ri(1,d-1);return{q:`${n}/${d} `,a:`${n}/${d}`,op:'frac',frac:{n,d}}};
+  // P4 upper
+  if(topic==='兩位乘兩位')return{gen:()=>{const a=ri(12,99),b=ri(12,99);return{q:`${a} × ${b}`,a:a*b,va:a,vb:b,op:'×'}}};
+  if(topic==='三位乘兩位')return{gen:()=>{const a=ri(100,999),b=ri(12,99);return{q:`${a} × ${b}`,a:a*b,va:a,vb:b,op:'×'}}};
+  if(topic==='長除法')return{gen:()=>{const d=ri(12,99),q=ri(2,9);return{q:`${d*q} ÷ ${d}`,a:q,va:d*q,vb:d,op:'÷'}}};
+  if(topic==='倍數')return{gen:()=>{const n=[2,3,5,9][ri(0,3)],q=ri(1,6);return{q:`${n} 的倍數表（第${q}個）`,a:n*q,va:n,vb:q,op:'xtable'}}};
+  if(topic==='因數')return{gen:()=>{const n=[12,18,24,36,48][ri(0,4)];const f=[];for(let i=1;i<=n;i++)if(n%i===0)f.push(i);return{q:`${n} 的因數是？`,a:f.join('、'),op:'factors'}}};
+  if(topic==='公倍數')return{gen:()=>{const a=ri(2,6),b=ri(2,6);const lcm=Math.abs(a*b)/gcd(a,b);return{q:`${a} 和 ${b} 的最小公倍數`,a:lcm,va:a,vb:b,op:'lcm'}}};
+  if(topic==='公因數')return{gen:()=>{const a=ri(6,30),b=ri(6,30);return{q:`${a} 和 ${b} 的最大公因數`,a:gcd(a,b),va:a,vb:b,op:'gcd'}}};
+  // P4 lower
+  if(topic==='除加混合')return{gen:()=>{const d=ri(2,9),q=ri(2,9),add=ri(1,9);return{q:`${d*q} ÷ ${d} + ${add}`,a:q+add,op:'divadd'}}};
+  if(topic==='除減混合')return{gen:()=>{const d=ri(2,9),q=ri(3,9),sub=ri(1,q-1);return{q:`${d*q} ÷ ${d} − ${sub}`,a:q-sub,op:'divsub'}}};
+  if(topic==='分數：真假帶'||topic==='擴分約分'||topic==='分數加減'){
+    if(topic==='擴分約分')return{gen:()=>{const d=[2,3,4,5][ri(0,3)],m=ri(2,5);return{q:`${d}/${d*m} = ?/${m}`,a:d,op:'eqfrac'}}};
+    if(topic==='分數加減')return{gen:genFracAdd};
+    return{gen:genFracBasic};
   }
-  const a = ri(2, 9), b = ri(2, 9);
-  return { q: `${a} × ${b}`, a: a * b, va: a, vb: b, op: '×' };
+  if(topic==='小數基礎')return{gen:genDecAdd};
+  // P5 upper
+  if(topic==='多位數讀寫')return{gen:()=>{const n=ri(100000,999999);return{q:`${n} 是？`,a:n.toLocaleString(),op:'place'}}};
+  if(topic==='四捨五入')return{gen:genRoundOff};
+  if(topic==='分數加減')return{gen:genFracAdd};
+  if(topic==='分數乘法')return{gen:()=>{const d1=[2,3,4][ri(0,2)],d2=[2,3,4][ri(0,2)],n1=ri(1,d1-1),n2=ri(1,d2-1);return{q:`${n1}/${d1} × ${n2}/${d2}`,a:`${n1*n2}/${d1*d2}`,op:'fracmul'}}};
+  if(topic==='分數四則混合')return{gen:genFracAdd};
+  // P5 lower
+  if(topic==='小數加減')return{gen:genDecAdd};
+  if(topic==='小數乘法')return{gen:genDecMul};
+  if(topic==='小數除法')return{gen:()=>{const d=[2,5][ri(0,1)],n=ri(1,9)+ri(1,9)/d;return{q:`${n.toFixed(1)} ÷ ${d}`,a:(n/d).toFixed(1),op:'÷'}}};
+  if(topic==='分數除以整數'||topic==='整數除以分數'||topic==='分數除以分數')return{gen:()=>{const d=ri(2,6),n=ri(1,d-1);return{q:`${n}/${d} = ?`,a:`${n}/${d}`,op:'frac'}}};
+  // P6 upper
+  if(topic==='百分數'||topic==='百分數加減')return{gen:genPct};
+  if(topic==='小數四則')return{gen:genDecAdd};
+  if(topic==='分數四則')return{gen:genFracAdd};
+  if(topic==='圓形面積')return{gen:genAreaCircle};
+  if(topic==='圓周')return{gen:genCircumference};
+  // P6 lower
+  if(topic==='體積與容量')return{gen:genVolume};
+  if(topic==='比例')return{gen:genRatio};
+  if(topic==='簡單方程')return{gen:genSimpleEq};
+  if(topic==='概率')return{gen:genSimpleProb};
+  if(topic==='平均數')return{gen:genAvg};
+  if(topic==='綜合練習')return{gen:genMixed};
+  // clock/timecalc always available
+  if(topic==='讀時鐘')return{gen:genClock};
+  if(topic==='時間計算')return{gen:genTimeCalc};
+  if(topic==='數線')return{gen:genNumberLine};
+  // default
+  return{gen:()=>{const a=ri(1,99),b=ri(1,99);return{q:`${a} + ${b}`,a:a+b,op:'+'}}};
 }
-function genDiv(lv) {
-  // 除法：整除，商為整數
-  if (lv === 'p4' || lv === 'p5') {
-    const b = ri(2, 9), q = ri(2, 99);
-    return { q: `${b * q} ÷ ${b}`, a: q, va: b * q, vb: b, op: '÷' };
-  }
-  const b = ri(2, 9), q = ri(2, 9);
-  return { q: `${b * q} ÷ ${b}`, a: q, va: b * q, vb: b, op: '÷' };
+function gcd(a,b){return b?gcd(b,a%b):a}
+
+function $(id){return document.getElementById(id)}
+
+function onGradeChange(){
+  const grade=$('optGrade').value;
+  const sel=$('optTopic');
+  const topics=CURRICULUM[grade]?.topics||[];
+  // add clock/timecalc as always-available
+  sel.innerHTML='<option value="">— 選擇課題 —</option><optgroup label="📏 本年級課題">'+topics.map(t=>`<option value="${t}">${t}</option>`).join('')+'</optgroup><optgroup label="🕐 時間與數線"><option value="讀時鐘">🕐 讀時鐘</option><option value="時間計算">⏱ 時間計算</option><option value="數線">📏 數線</option></optgroup>';
+  onTopicChange();
 }
-function genMixed(lv) {
-  const fns = [genAdd, genSub, genMul, genDiv];
-  return fns[ri(0, fns.length - 1)](lv);
+function onTopicChange(){
+  const topic=$('optTopic').value;
+  // layout hint
+  const vtopics=['長除法','兩位乘兩位','三位乘兩位','乘加混合','乘減混合','乘除混合','除加混合','除減混合'];
+  $('optLayout').value=vtopics.includes(topic)?'v':'h';
 }
 
-/* ---------- 時間題 ---------- */
-function genClock() {
-  // 讀時鐘：隨機時間，畫鐘面，答案 = 幾點幾十分
-  const h = ri(1, 12), m = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55][ri(0, 11)];
-  const hour = h % 12 || 12;
-  const minuteStr = String(m).padStart(2, '0');
-  return { q: 'clock', clock: { h, m }, a: `${hour}:${minuteStr}`, va: h, vb: m, op: 'clock' };
-}
-function genTimeCalc(lv) {
-  // 時間計算：開始時間 + 間隔 = 結束時間
-  const h1 = ri(0, 11), m1 = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55][ri(0, 11)];
-  // 間隔：5-60 分鐘（5 的倍數）
-  const mins = ri(1, 12) * 5;
-  const total = h1 * 60 + m1 + mins;
-  const h2 = Math.floor(total / 60), m2 = total % 60;
-  const f = (h, m) => `${h % 12 || 12}:${String(m).padStart(2, '0')}`;
-  return { q: 'timecalc', timecalc: { h1, m1, mins }, a: f(h2, m2), va: h1, vb: m1, op: 'timecalc' };
-}
+function generate(reseed){
+  const grade=$('optGrade').value;
+  const topic=$('optTopic').value;
+  if(!topic){alert('請先選擇課題！');return}
+  const count=parseInt($('optCount').value)||24;
+  const perRow=parseInt($('optPerRow').value)||6;
+  const layout=$('optLayout').value;
+  const printSize=$('optPrintSize').value;
+  const showAns=$('optShowAns').checked;
+  const underline=$('optUnderline').checked;
+  const num=$('optNum').checked;
+  const title=$('optTitle').value.trim()||$('optGrade').selectedOptions[0].text;
+  const name=$('optName').value.trim();
+  const date=$('optDate').value.trim()||new Date().toLocaleDateString('zh-HK');
 
-function makeQuestion(qtype, lv) {
-  switch (qtype) {
-    case 'add': return genAdd(lv);
-    case 'sub': return genSub(lv);
-    case 'mul': return genMul(lv);
-    case 'div': return genDiv(lv);
-    case 'mixed': return genMixed(lv);
-    case 'clock': return genClock();
-    case 'timecalc': return genTimeCalc(lv);
-  }
+  const{gen}=pickGen(topic,grade);
+  const questions=[];
+  for(let i=0;i<count;i++){const q=typeof gen==='function'?gen():gen.gen();questions.push(q)}
+
+  render(questions,{grade,topic,count,perRow,layout,printSize,showAns,underline,num,title,name,date});
+  try{localStorage.setItem('me_prefs',JSON.stringify({grade,topic,count,perRow,layout,printSize,showAns,underline,num,title,name,date}))}catch(e){}
 }
 
-/* ================= 生成工作紙 ================= */
-let currentQuestions = [];
-let currentOptions = {};
-
-function $(id) { return document.getElementById(id); }
-
-function loadPrefs() {
-  try {
-    const p = JSON.parse(localStorage.getItem('mathsexercise_prefs') || '{}');
-    if (p.qtype) setQType(p.qtype);
-    if (p.level) $('optLevel').value = p.level;
-    if (p.count) $('optCount').value = p.count;
-    if (p.perRow) $('optPerRow').value = p.perRow;
-    if (p.layout) $('optLayout').value = p.layout;
-    if (p.printSize) $('optPrintSize').value = p.printSize;
-    if (p.title !== undefined) $('optTitle').value = p.title;
-    if (p.name !== undefined) $('optName').value = p.name;
-    if (p.date !== undefined) $('optDate').value = p.date;
-    if (p.showAns !== undefined) $('optShowAns').checked = p.showAns;
-    if (p.underline !== undefined) $('optUnderline').checked = p.underline;
-    if (p.num !== undefined) $('optNum').checked = p.num;
-  } catch (e) { /* ignore */ }
-}
-function savePrefs() {
-  const p = {
-    qtype: currentOptions.qtype, level: $('optLevel').value, count: $('optCount').value,
-    perRow: $('optPerRow').value, layout: $('optLayout').value, printSize: $('optPrintSize').value,
-    title: $('optTitle').value, name: $('optName').value, date: $('optDate').value,
-    showAns: $('optShowAns').checked, underline: $('optUnderline').checked, num: $('optNum').checked,
-  };
-  try { localStorage.setItem('mathsexercise_prefs', JSON.stringify(p)); } catch (e) {}
-}
-
-let qtype = 'add';
-function setQType(t) {
-  qtype = t;
-  document.querySelectorAll('.qtype-btn').forEach(b => b.classList.toggle('active', b.dataset.q === t));
-  // 直式只適用於四則；時鐘／時間計算用橫式
-  if (t === 'clock' || t === 'timecalc') $('optLayout').value = 'h';
-  currentOptions.qtype = t;
-}
-
-function generate(reseed) {
-  const opts = {
-    qtype, level: $('optLevel').value, count: parseInt($('optCount').value) || 24,
-    perRow: parseInt($('optPerRow').value) || 6, layout: $('optLayout').value,
-    printSize: $('optPrintSize').value, title: $('optTitle').value.trim(),
-    name: $('optName').value.trim(), date: $('optDate').value.trim(),
-    showAns: $('optShowAns').checked, underline: $('optUnderline').checked, num: $('optNum').checked,
-  };
-  currentOptions = opts;
-
-  if (!reseed) {
-    // 新生成
-    currentQuestions = [];
-    for (let i = 0; i < opts.count; i++) currentQuestions.push(makeQuestion(qtype, opts.level));
-  } else {
-    // 換新題目：只改數字（保持相同題型）
-    currentQuestions = currentQuestions.map(() => makeQuestion(qtype, opts.level));
-  }
-  render();
-  savePrefs();
-}
-
-function render() {
-  const opts = currentOptions;
+function render(questions,opts){
   $('printBar').classList.add('show');
+  $('wsTitle').textContent=opts.title;
+  $('wsMeta').textContent=[opts.name&&('姓名：'+opts.name),opts.date&&('日期：'+opts.date)].filter(Boolean).join('　')||opts.date;
 
-  // header
-  $('wsTitle').textContent = opts.title || '數學練習';
-  const dateStr = opts.date || new Date().toLocaleDateString('zh-HK', { year: 'numeric', month: 'long', day: 'numeric' });
-  $('wsMeta').textContent = [opts.name && ('姓名：' + opts.name), opts.date && ('日期：' + opts.date)].filter(Boolean).join('　') || dateStr;
+  const ws=$('worksheet');
+  const cellPx=opts.perRow<=6?'108px':'86px';
+  ws.style.setProperty('--cell',cellPx);
+  ws.style.setProperty('--cell-font',`${cellPx} * .55`);
+  ws.style.setProperty('--print-cell',opts.printSize);
+  ws.style.setProperty('--print-cell-font',`calc(${opts.printSize} * .55)`);
 
-  // apply print size vars
-  const ws = $('worksheet');
-  ws.style.setProperty('--cell', opts.perRow <= 6 ? '110px' : '86px');
-  ws.style.setProperty('--cell-font', `calc(${opts.perRow <= 6 ? '110px' : '86px'} * 0.55)`);
-  ws.style.setProperty('--print-cell', opts.printSize);
-  ws.style.setProperty('--print-cell-font', `calc(${opts.printSize} * 0.55)`);
-
-  // build question cells
-  const area = $('qArea');
-  area.innerHTML = '';
-  const perRow = opts.perRow;
+  const area=$('qArea');area.innerHTML='';
   let row;
-  const showAns = opts.showAns;
-  const underline = opts.underline;
-  const num = opts.num;
+  questions.forEach((q,idx)=>{
+    if(idx%opts.perRow===0){row=document.createElement('div');row.className='qrow';area.appendChild(row)}
+    const cell=document.createElement('div');
+    cell.className='qcell'+(q.op==='clock'?' clock-cell':'');
+    if(opts.showAns)cell.classList.add('show-ans');
+    cell.dataset.ans=typeof q.a==='number'?q.a:q.a;
 
-  currentQuestions.forEach((q, idx) => {
-    if (idx % perRow === 0) { row = document.createElement('div'); row.className = 'qrow'; area.appendChild(row); }
-    const cell = document.createElement('div');
-    cell.className = 'qcell' + (q.op === 'clock' ? ' clock-cell' : '');
-    if (showAns) cell.classList.add('show-ans');
-    cell.dataset.ans = q.a;
-
-    if (q.op === 'clock') {
-      cell.innerHTML = clockSVG(q.clock.h, q.clock.m);
-      const numDiv = document.createElement('div');
-      numDiv.className = 'clock-num';
-      numDiv.textContent = '______';
-      cell.appendChild(numDiv);
-    } else if (q.op === 'timecalc') {
-      const inner = document.createElement('div');
-      inner.className = 'qtext';
-      inner.style.fontSize = '0.5em';
-      inner.style.lineHeight = '1.45';
-      inner.style.padding = '6px';
-      const tc = q.timecalc;
-      const f = (h, m) => `${h % 12 || 12}:${String(m).padStart(2, '0')}`;
-      inner.textContent = `${f(tc.h1, tc.m1)} 開始，經過 ${tc.mins} 分鐘，是幾點？`;
-      cell.appendChild(inner);
-      if (underline) { const l = document.createElement('div'); l.className = 'ans-line'; cell.appendChild(l); }
-    } else if (opts.layout === 'v' && ['+', '−', '×', '÷'].includes(q.op)) {
-      cell.classList.add('vmode');
-      cell.style.fontSize = 'calc(var(--cell-font) * 0.72)';
-      const v = document.createElement('div');
-      v.className = 'vmath';
-      const op = document.createElement('span');
-      op.className = 'vop';
-      op.textContent = q.op;
-      const n1 = document.createElement('div');
-      n1.textContent = String(q.va).padStart(Math.max(String(q.va).length, String(q.vb).length), ' ');
-      const line = document.createElement('div');
-      line.className = 'vline';
-      const n2 = document.createElement('div');
-      n2.textContent = String(q.vb).padStart(Math.max(String(q.va).length, String(q.vb).length), ' ');
-      const ans = document.createElement('div');
-      ans.className = 'vans' + (underline ? ' fill' : '');
-      ans.dataset.ans = q.a;
-      v.appendChild(op); v.appendChild(n1); v.appendChild(line); v.appendChild(n2); v.appendChild(ans);
-      cell.appendChild(v);
-    } else {
-      const inner = document.createElement('div');
-      inner.className = 'qtext';
-      inner.textContent = q.q;
-      cell.appendChild(inner);
-      if (underline) { const l = document.createElement('div'); l.className = 'ans-line'; cell.appendChild(l); }
+    if(q.op==='clock'){
+      cell.innerHTML=clockSVG(q.clock.h,q.clock.m);
+      const nd=document.createElement('div');nd.className='clock-num';nd.textContent='___:___';cell.appendChild(nd);
+    }else if(q.op==='timecalc'){
+      const inner=document.createElement('div');inner.className='qtext';inner.style.fontSize='.48em';inner.style.lineHeight='1.4';
+      const tc=q.timecalc,f=(h,m)=>`${h%12||12}:${String(m).padStart(2,'0')}`;
+      inner.innerHTML=`${f(tc.h1,tc.m1)} 開始<br>經過 ${tc.mins} 分鐘<br>是幾點？`;cell.appendChild(inner);
+      if(opts.underline){const l=document.createElement('div');l.className='ans-line';cell.appendChild(l)}
+    }else if(q.op==='numberline'){
+      cell.style.cssText='width:auto;min-width:var(--cell);padding:4px 6px;overflow:visible';
+      const nl=q.numberline,step=Math.floor(100/(nl.vals.length+1)),right=10;
+      let svg=`<svg viewBox="0 0 200 60" style="width:100%;height:100%"><line x1="5" y1="30" x2="195" y2="30" stroke="var(--ink)" stroke-width="2"/><polygon points="190,25 200,30 190,35" fill="var(--ink)"/>`;
+      nl.vals.forEach((v,i)=>{
+        const x=15+i*step;
+        svg+=`<line x1="${x}" y1="25" x2="${x}" y2="35" stroke="var(--ink)" stroke-width="2"/>`;
+        if(v!==null)svg+=`<text x="${x}" y="50" text-anchor="middle" font-size="11" fill="var(--ink)">${v}</text>`;
+        else svg+=`<text x="${x}" y="50" text-anchor="middle" font-size="11" fill="var(--red)" font-weight="700">？</text>`;
+      });
+      svg+=`</svg>`;cell.innerHTML=svg;
+    }else if(opts.layout==='v'&&['+','−','×','÷'].includes(q.op)){
+      cell.classList.add('vmode');cell.style.fontSize='calc(var(--cell-font) * .72)';
+      const v=document.createElement('div');v.className='vmath';
+      const op=document.createElement('span');op.className='vop';op.textContent=q.op;
+      const va=String(q.va||0),vb=String(q.vb||0),pad=Math.max(va.length,vb.length);
+      const n1=document.createElement('div');n1.textContent=va.padStart(pad);
+      const line=document.createElement('div');line.className='vline';
+      const n2=document.createElement('div');n2.textContent=vb.padStart(pad);
+      const ans=document.createElement('div');ans.className='vans'+(opts.underline?' fill':'');ans.dataset.ans=q.a;
+      v.append(op,n1,line,n2,ans);cell.appendChild(v);
+    }else{
+      const inner=document.createElement('div');inner.className='qtext';
+      inner.textContent=q.q;cell.appendChild(inner);
+      if(opts.underline){const l=document.createElement('div');l.className='ans-line';cell.appendChild(l)}
     }
-    if (num) {
-      const n = document.createElement('span');
-      n.style.cssText = 'position:absolute;top:4%;left:6%;font-size:0.32em;color:var(--gray);font-weight:400;';
-      n.textContent = idx + 1;
-      cell.appendChild(n);
-    }
+    if(opts.num){const n=document.createElement('span');n.style.cssText='position:absolute;top:4%;left:6%;font-size:.3em;color:var(--gray);font-weight:400';n.textContent=idx+1;cell.appendChild(n)}
     row.appendChild(cell);
   });
 }
 
-/* ================= 時鐘 SVG ================= */
-function clockSVG(h, m) {
-  // 12-hour clock face, hands for h:m
-  const hAngle = ((h % 12) * 30) + (m / 2);
-  const mAngle = m * 6;
-  const hx = 50 + 26 * Math.sin(hAngle * Math.PI / 180);
-  const hy = 50 - 26 * Math.cos(hAngle * Math.PI / 180);
-  const mx = 50 + 34 * Math.sin(mAngle * Math.PI / 180);
-  const my = 50 - 34 * Math.cos(mAngle * Math.PI / 180);
-  let ticks = '';
-  for (let i = 0; i < 12; i++) {
-    const a = i * 30 * Math.PI / 180;
-    const x1 = 50 + 42 * Math.sin(a), y1 = 50 - 42 * Math.cos(a);
-    const x2 = 50 + 46 * Math.sin(a), y2 = 50 - 46 * Math.cos(a);
-    ticks += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#888" stroke-width="1.5"/>`;
-  }
-  return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="50" cy="50" r="47" fill="none" stroke="#3A3A3A" stroke-width="2.5"/>
-    ${ticks}
-    <line x1="50" y1="50" x2="${hx.toFixed(1)}" y2="${hy.toFixed(1)}" stroke="#3A3A3A" stroke-width="4" stroke-linecap="round"/>
-    <line x1="50" y1="50" x2="${mx.toFixed(1)}" y2="${my.toFixed(1)}" stroke="#C0392B" stroke-width="2.5" stroke-linecap="round"/>
-    <circle cx="50" cy="50" r="2.5" fill="#3A3A3A"/>
-  </svg>`;
+function clockSVG(h,m){
+  const ha=(h%12)*30+(m/2),ma=m*6;
+  const hx=50+26*Math.sin(ha*Math.PI/180),hy=50-26*Math.cos(ha*Math.PI/180);
+  const mx=50+34*Math.sin(ma*Math.PI/180),my=50-34*Math.cos(ma*Math.PI/180);
+  let ticks='';
+  for(let i=0;i<12;i++){const a=i*30*Math.PI/180;ticks+=`<line x1="${(50+42*Math.sin(a)).toFixed(1)}" y1="${(50-42*Math.cos(a)).toFixed(1)}" x2="${(50+46*Math.sin(a)).toFixed(1)}" y2="${(50-46*Math.cos(a)).toFixed(1)}" stroke="#888" stroke-width="1.5"/>`}
+  return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="47" fill="none" stroke="#3A3A3A" stroke-width="2.5"/>${ticks}<line x1="50" y1="50" x2="${hx.toFixed(1)}" y2="${hy.toFixed(1)}" stroke="#3A3A3A" stroke-width="4" stroke-linecap="round"/><line x1="50" y1="50" x2="${mx.toFixed(1)}" y2="${my.toFixed(1)}" stroke="#C0392B" stroke-width="2.5" stroke-linecap="round"/><circle cx="50" cy="50" r="2.5" fill="#3A3A3A"/></svg>`;
 }
 
-/* ================= 答案顯示切換 ================= */
-function toggleShowAns() {
-  const show = !currentOptions.showAns;
-  currentOptions.showAns = show;
-  $('optShowAns').checked = show;
-  render();
+function toggleShowAns(){
+  document.querySelectorAll('.qcell').forEach(c=>c.classList.toggle('show-ans'));
 }
 
-/* ================= A4 預覽 ================= */
-function openA4Preview() {
-  const ws = $('worksheet');
-  const overlay = $('a4PreviewOverlay');
-  const frame = $('a4PreviewFrame');
-  const info = $('a4PreviewInfo');
-  const warn = $('a4PreviewWarn');
-  const o = currentOptions;
-
-  info.textContent = `題型：${o.qtype} · 題數：${currentQuestions.length} · 每行：${o.perRow}格 · 印刷格：${o.printSize}`;
-  warn.textContent = o.perRow > 8 ? '⚠️ 每行格數較多，列印時會跟隨 A4 寬度自動換行，實際排版可能與預覽略有不同。' : '';
-
-  const clone = ws.cloneNode(true);
-  clone.style.position = 'relative';
-  clone.style.margin = '0';
-  clone.style.width = '794px';
-  clone.style.maxWidth = 'none';
-  clone.style.boxShadow = 'none';
-  clone.style.padding = '45px';
-  clone.style.setProperty('--cell', '86px');
-  clone.style.setProperty('--cell-font', 'calc(86px * 0.55)');
-  clone.style.setProperty('--print-cell', o.printSize);
-  clone.style.setProperty('--print-cell-font', `calc(${o.printSize} * 0.55)`);
-  clone.querySelectorAll('.no-print').forEach(el => el.remove());
-  frame.innerHTML = '';
-  frame.appendChild(clone);
-
-  const SCALE = 0.5;
-  frame.style.width = Math.round(794 * SCALE) + 'px';
-  frame.style.height = Math.round(1123 * SCALE) + 'px';
-  clone.style.transform = `scale(${SCALE})`;
-  clone.style.transformOrigin = 'top left';
-
-  overlay.style.display = 'flex';
-  overlay.classList.add('show');
+function openA4Preview(){
+  const ws=$('worksheet'),overlay=$('a4PreviewOverlay'),frame=$('a4PreviewFrame'),info=$('a4PreviewInfo');
+  info.textContent=`題數：${document.querySelectorAll('.qcell').length} · 每行：${$('optPerRow').value}格 · 印刷格：${$('optPrintSize').value}`;
+  const clone=ws.cloneNode(true);
+  Object.assign(clone.style,{position:'relative',margin:'0',width:'794px',maxWidth:'none',boxShadow:'none',padding:'45px'});
+  clone.style.setProperty('--cell','86px');
+  clone.style.setProperty('--cell-font','calc(86px * .55)');
+  clone.style.setProperty('--print-cell',$('optPrintSize').value);
+  clone.style.setProperty('--print-cell-font',`calc(${$('optPrintSize').value} * .55)`);
+  clone.querySelectorAll('.no-print').forEach(el=>el.remove());
+  frame.innerHTML='';frame.appendChild(clone);
+  frame.style.width=Math.round(794*.5)+'px';frame.style.height=Math.round(1123*.5)+'px';
+  clone.style.transform='scale(.5)';clone.style.transformOrigin='top left';
+  overlay.style.display='flex';overlay.classList.add('show');
 }
-function closeA4Preview() {
-  const overlay = $('a4PreviewOverlay');
-  overlay.style.display = 'none';
-  overlay.classList.remove('show');
-}
+function closeA4Preview(){$('a4PreviewOverlay').classList.remove('show');$('a4PreviewOverlay').style.display='none'}
 
-/* ================= init ================= */
-(function init() {
-  document.querySelectorAll('.qtype-btn').forEach(b => {
-    b.addEventListener('click', () => setQType(b.dataset.q));
-  });
-  setQType('add');
-  loadPrefs();
+/* ===== init ===== */
+(function(){
+  try{const p=JSON.parse(localStorage.getItem('me_prefs')||'{}');if(p.grade)$('optGrade').value=p.grade;if(p.topic)$('optTopic').value=p.topic;if(p.count)$('optCount').value=p.count;if(p.perRow)$('optPerRow').value=p.perRow;if(p.layout)$('optLayout').value=p.layout;if(p.printSize)$('optPrintSize').value=p.printSize;if(p.showAns!==undefined)$('optShowAns').checked=p.showAns;if(p.underline!==undefined)$('optUnderline').checked=p.underline;if(p.num!==undefined)$('optNum').checked=p.num;if(p.title!==undefined)$('optTitle').value=p.title;if(p.name!==undefined)$('optName').value=p.name;if(p.date!==undefined)$('optDate').value=p.date}catch(e){}
+  onGradeChange();
+  if($('optTopic').value)$('optTopic').value=$('optTopic').value;
   generate();
 })();
 </script>
