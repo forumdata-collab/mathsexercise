@@ -298,7 +298,7 @@ function genNumberLine(){
   const start=ri(0,5)*step,blank=ri(2,6);
   const vals=[];
   for(let i=0;i<7;i++)vals.push(i===blank?null:start+i*step);
-  const ans=vals[blank];
+  const ans=start+blank*step;
   return{q:'numberline',numberline:{vals,blank},a:ans,va:start,vb:step,op:'numberline'}
 }
 /* --- Misc P6 --- */
