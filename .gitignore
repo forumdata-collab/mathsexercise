@@ -1,1 +1,20 @@
+# Cloudflare / Wrangler
 .wrangler/
+dist/
+
+# Local test artefacts
+_test.html
+_p.html
+_p2.html
+_pr.html
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Logs
+*.log
+npm-debug.log*
